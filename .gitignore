@@ -2,3 +2,4 @@
 runtime/*
 config/*
 mysql_import-*.bat
+mysql_import-*.sh
