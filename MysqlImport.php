@@ -125,7 +125,12 @@ class MysqlImport
         }
         else {
             $targetPath = strtr($this->remotePath, array('{date}' => $date)) . '/' . $this->remoteDatabase . '.* ';
-            $command = "{$this->rsync}  -avz --progress {$this->sshUsername}@{$this->sshHost}:/$targetPath $localPath --exclude-from $excludeFile";
+            $vSshPort = trim($this->sshPort);
+            $vRsyncPort = '';
+            if (!$vSshPort || ($vSshPort != 22)) {
+                $vRsyncPort = "-e 'ssh -p {$this->sshPort}'";
+            }
+            $command = "{$this->rsync}  $vRsyncPort  -avz --progress {$this->sshUsername}@{$this->sshHost}:/$targetPath $localPath --exclude-from $excludeFile";
         }
 
         return $command;
