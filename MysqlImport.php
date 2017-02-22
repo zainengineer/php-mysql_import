@@ -92,6 +92,7 @@ class MysqlImport
     public $remotePathDate;
 
     public $showProgress = false;
+    public $remoteCommand;
 
     /**
      * Construct the class
@@ -103,12 +104,49 @@ class MysqlImport
             $this->$key = $value;
         }
     }
+    public function remoteCommandExecute()
+    {
+        if ($this->remoteCommand){
+            $vOutput = '';
+            if (function_exists('ssh2_connect')){
+                $sshResource = ssh2_connect($this->sshHost,$this->sshPort);
+                if (ssh2_auth_pubkey_file($sshResource, 'zain',
+                    getenv("HOME") . '/.ssh/id_rsa.pub',
+                    getenv("HOME") . '/.ssh/id_rsa')) {
+                    $fStartTime = microtime(true);
+                    $stream = ssh2_exec($sshResource,$this->remoteCommand );
+                    stream_set_blocking($stream, true);
+                    $stream_out = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+                    $stream_error = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+                    $vStandardOutput = stream_get_contents($stream_out);
+                    $vErrorOutput = stream_get_contents($stream_error);
+                    $fDiff = microtime(true) - $fStartTime;
+
+                } else {
+                    echo ('Public Key Authentication Failed');
+                }
+            }
+            if (!empty($vStandardOutput) || !empty($vErrorOutput)){
+                echo "remote command " . $this->remoteCommand . "  executed in $fDiff seconds output: \n";
+                echo $vOutput . "\n";
+                echo "error is: \n";
+                echo $vErrorOutput;
+            }
+            else{
+                echo "issues executing remote command " . $this->remoteCommand;
+            }
+            echo "\nPress Enter to continue";
+            $handle = fopen ("php://stdin","r");
+            fgets($handle);
+        }
+    }
 
     /**
      * Generate the commands to download the database files using rsync
      */
     public function generateDownload()
     {
+        $this->remoteCommandExecute();
         if ($this->isWindows()) {
             $localPath = '/cygdrive/' . strtr($this->localPath, array('\\' => '/', ':' => ''));
             $excludeFile = '/cygdrive/' . strtr($this->excludeFile, array('\\' => '/', ':' => ''));
