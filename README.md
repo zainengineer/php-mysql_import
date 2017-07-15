@@ -2,7 +2,7 @@ Create your own configuration under `config/`
 
 Optionally install ssh extension `apt-get install php-ssh2` or `apt-get install php56-ssh2`
 
-Execute command like `/config/commands/zain/mysql_import_project.sh`
+Execute command like `bash config/commands/zain/mysql_import_project.sh`
 
 Sample Contents:
 
