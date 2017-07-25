@@ -227,7 +227,8 @@ class MysqlImport
     {
         $mysqlCommand = "mysql --user={$this->localUser} --password={$this->localPass} --host={$this->localHost} --port={$this->localPort} --database={$this->localDatabase}";
         $fileName = basename($filePath, '.sql.gz');
-        $tableName = end(explode('.', $fileName));
+        $aParts = explode('.', $fileName);
+        $tableName = end($aParts);
         $tableName = str_replace('-schema', '', $tableName);
 
         $addLinesToPipe = <<<'PipeCommand'
