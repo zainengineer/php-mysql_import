@@ -27,6 +27,11 @@ switch ($action) {
         break;
     case 'unzipAndImport':
         $commands = $mysqlImport->generateUnzipAndImportList();
-        file_put_contents('runtime/' . $site . '/deflate_and_import.bash', $commands);
+        $filePath = 'runtime/' . $site . '/deflate_and_import.bash';
+        echo "script file created at $filePath\n";
+        file_put_contents($filePath, $commands);
+        break;
+    default:
+        echo "unexpected option $action\n";
         break;
 }
